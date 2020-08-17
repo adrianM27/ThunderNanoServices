@@ -1,0 +1,20 @@
+{
+ "locator":"libWPEFrameworkRDKMediaEngine.so",
+ "classname":"RDKMediaEngine",
+ "precondition":[
+  "Platform"
+ ],
+ "callsign":"org.rdk.RDKMediaEngine",
+ "autostart":true,
+ "configuration":{
+  "root":{
+   "threads":2,
+   "outofprocess":true
+  },
+  "decoders":null,
+  "Aamp":{
+   "frontends":0,
+   "westerossink":true
+  }
+ }
+}
