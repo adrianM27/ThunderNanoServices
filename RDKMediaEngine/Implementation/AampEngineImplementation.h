@@ -84,8 +84,8 @@ namespace WPEFramework {
             };
 
             void SendEvent(const string& eventName, const string& parameters);
-            void DeinitializePlayerInstanceNoBlocking();
-            uint32_t InitializePlayerInstanceNoBlocking();
+            void DeinitializePlayerInstance();
+            uint32_t InitializePlayerInstance();
             uint32_t AssertPlayerStateAndIdNoBlocking(const string& id);
 
             mutable Core::CriticalSection _adminLock;

@@ -43,7 +43,7 @@ namespace WPEFramework {
         {
             SYSLOG(Logging::Shutdown, (_T("Destructing")));
             _adminLock.Lock();
-            DeinitializePlayerInstanceNoBlocking();
+            DeinitializePlayerInstance();
             ASSERT(_aampPlayer == nullptr);
             ASSERT(_aampEventListener == nullptr);
             ASSERT(_aampGstPlayerMainLoop == nullptr);
@@ -61,11 +61,11 @@ namespace WPEFramework {
 
             if(_initialized)
             {
-                DeinitializePlayerInstanceNoBlocking();
+                DeinitializePlayerInstance();
                 _initialized = false;
             }
 
-            uint32_t result = InitializePlayerInstanceNoBlocking();
+            uint32_t result = InitializePlayerInstance();
             if(result == Core::ERROR_NONE)
             {
                 _initialized = true;
@@ -83,7 +83,7 @@ namespace WPEFramework {
             _adminLock.Lock();
             if(_initialized)
             {
-                DeinitializePlayerInstanceNoBlocking();
+                DeinitializePlayerInstance();
                 _initialized = false;
             }
 
@@ -188,7 +188,7 @@ namespace WPEFramework {
             SYSLOG(Logging::Notification, (_T("InitConfig with id=%s and config=%s"),
                     id.c_str(), configurationJson.c_str()));
             _adminLock.Lock();
-            //no parameter supported right now
+            //TODO: no parameter supported right now
             _adminLock.Unlock();
             return Core::ERROR_NONE;
         }
@@ -198,7 +198,7 @@ namespace WPEFramework {
             SYSLOG(Logging::Notification, (_T("InitDRMConfig with id=%s and config=%s"),
                     id.c_str(), configurationJson.c_str()));
             _adminLock.Lock();
-            //no parameter supported right now
+            //TODO: no parameter supported right now
             _adminLock.Unlock();
             return Core::ERROR_NONE;
         }
@@ -245,7 +245,7 @@ namespace WPEFramework {
             return WPEFramework::Core::infinite;
         }
 
-        uint32_t AampEngineImplementation::InitializePlayerInstanceNoBlocking()
+        uint32_t AampEngineImplementation::InitializePlayerInstance()
         {
             ASSERT(_aampPlayer == nullptr);
             ASSERT(_aampEventListener == nullptr);
@@ -262,7 +262,7 @@ namespace WPEFramework {
             if(_aampEventListener == nullptr)
             {
                 //cleanup
-                DeinitializePlayerInstanceNoBlocking();
+                DeinitializePlayerInstance();
                 return Core::ERROR_GENERAL;
             }
 
@@ -295,13 +295,14 @@ namespace WPEFramework {
             return Core::ERROR_NONE;
         }
 
-        void AampEngineImplementation::DeinitializePlayerInstanceNoBlocking()
+        void AampEngineImplementation::DeinitializePlayerInstance()
         {
             if(_aampPlayer)
             {
                 _aampPlayer->Stop();
             }
 
+            _adminLock.Unlock();
             Block();
             if(_aampGstPlayerMainLoop)
             {
@@ -309,6 +310,8 @@ namespace WPEFramework {
             }
 
             Wait(Thread::BLOCKED | Thread::STOPPED, Core::infinite);
+
+            _adminLock.Lock();
 
             if(_aampPlayer)
             {
